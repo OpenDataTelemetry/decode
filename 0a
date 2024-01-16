@@ -1,0 +1,10 @@
+01016e
+0201eb
+0ae909df36d208c21b
+0c0cde
+
+
+NodeName: M-051
+Hex: 01013702021f0ae909e094d208c19b0c0cde
+SmartLights,applicationID=6,nodeName=M-051,devEUI=0004a30b00e97b2f,rxInfo_mac_0=7276ff00080801db,rxInfo_name_0=IMT-kerlink-blocoH,rxInfo_mac_1=b827ebfffe5ddbb6,rxInfo_name_1=ASPGW7509,rxInfo_mac_2=7276ff000b031df7,rxInfo_name_2=IMT-kerlink-blocoW2,txInfo_dataRate_modulation=LORA,txInfo_dataRate_bandwidth=125,txInfo_adr=true,txInfo_codeRate=4/5,fPort=100 rxInfo_rssi_0=-95,rxInfo_loRaSNR_0=10,rxInfo_latitude_0=-23.64884,rxInfo_longitude_0=-46.57418,rxInfo_altitude_0=809,rxInfo_rssi_1=-116,rxInfo_loRaSNR_1=1,rxInfo_latitude_1=-23.6478,rxInfo_longitude_1=-46.57503,rxInfo_altitude_1=767,rxInfo_rssi_2=-91,rxInfo_loRaSNR_2=-3,rxInfo_latitude_2=-23.64918,rxInfo_longitude_2=-46.57367,rxInfo_altitude_2=804,txInfo_frequency=915800000,txInfo_dataRate_spreadFactor=9,data_temperature=31.1,data_humidity=54.3,data_lat=-23.647316,data_lon=-46.573851,data_boardVoltage=3.294,fCnt=126 1703181671800963000
+Delivered message to OpenDataTelemetry-telegraf-smartcampusmaua[0]@8930

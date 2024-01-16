@@ -59,6 +59,11 @@ func LoraImt(d string) (string, error) {
 
 	json.Unmarshal([]byte(d), &imt)
 
+	// Show NodeName before Panic
+	fmt.Printf("\n\nNodeName: %v\n", imt.NodeName)
+	hex, _ := b64ToHex(imt.Data)
+	fmt.Printf("Hex: %v\n", hex)
+
 	// Set measurement
 	applicationName := imt.ApplicationName
 	sb.WriteString(applicationName)
@@ -136,25 +141,13 @@ func LoraImt(d string) (string, error) {
 		sb.WriteString("rxInfo_latitude_")
 		sb.WriteString(strconv.FormatUint(uint64(i), 10))
 		sb.WriteString("=")
-		sb.WriteString(strconv.FormatInt(int64(v.Latitude), 10))
+		sb.WriteString(strconv.FormatFloat(v.Latitude, 'f', -1, 64))
 		sb.WriteString(",")
 
 		sb.WriteString("rxInfo_longitude_")
 		sb.WriteString(strconv.FormatUint(uint64(i), 10))
 		sb.WriteString("=")
-		sb.WriteString(strconv.FormatInt(int64(v.Longitude), 10))
-		sb.WriteString(",")
-
-		sb.WriteString("rxInfo_longitude_")
-		sb.WriteString(strconv.FormatUint(uint64(i), 10))
-		sb.WriteString("=")
-		sb.WriteString(strconv.FormatInt(int64(v.Longitude), 10))
-		sb.WriteString(",")
-
-		sb.WriteString("rxInfo_longitude_")
-		sb.WriteString(strconv.FormatUint(uint64(i), 10))
-		sb.WriteString("=")
-		sb.WriteString(strconv.FormatInt(int64(v.Longitude), 10))
+		sb.WriteString(strconv.FormatFloat(v.Longitude, 'f', -1, 64))
 		sb.WriteString(",")
 
 		sb.WriteString("rxInfo_altitude_")
@@ -176,7 +169,8 @@ func LoraImt(d string) (string, error) {
 	data := imt.Data
 	b, err := b64ToByte(data)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Print(imt.Data)
+		log.Panic(err)
 	}
 
 	switch imt.FPort {
@@ -208,11 +202,14 @@ func LoraImt(d string) (string, error) {
 func imtIotProtocolParser(bytes []byte) string {
 	var sb strings.Builder
 	len := len(bytes)
+	counter_0d := 0
+	energy_0e := 0
 
+PL: // Parse Loop
 	for i := 0; i < len; i++ {
 		switch bytes[i] {
-		case 0x00:
-			fmt.Println("00")
+		// case 0x00:
+		// fmt.Println("00")
 
 		case 0x01:
 			sb.WriteString("data_temperature=")
@@ -232,132 +229,132 @@ func imtIotProtocolParser(bytes []byte) string {
 			sb.WriteString(",")
 			i = i + 2
 
-		// 	// case 0x03:
-		// 	//   var press = {};
-		// 	//   press.v = (bytes[index++]<<8) | bytes[index++];
-		// 	//   press.n = "press";
-		// 	//   press.u = "hPa";
-		// 	//   decoded.modules.push(press);
-		// 	//   break;
+			// 	// case 0x03:
+			// 	//   var press = {};
+			// 	//   press.v = (bytes[index++]<<8) | bytes[index++];
+			// 	//   press.n = "press";
+			// 	//   press.u = "hPa";
+			// 	//   decoded.modules.push(press);
+			// 	//   break;
 
-		// 	// case 0x04:
-		// 	//   var corrente = {};
-		// 	//   corrente.v = (bytes[index++]<<8) | bytes[index++];
-		// 	//   corrente.n = "corrente";
-		// 	//   corrente.u = "A";
-		// 	//   decoded.modules.push(corrente);
-		// 	//   break;
+			// 	// case 0x04:
+			// 	//   var corrente = {};
+			// 	//   corrente.v = (bytes[index++]<<8) | bytes[index++];
+			// 	//   corrente.n = "corrente";
+			// 	//   corrente.u = "A";
+			// 	//   decoded.modules.push(corrente);
+			// 	//   break;
 
-		// 	// case 0x05:
-		// 	//   var gyrox = {};
-		// 	//   gyrox.v = (bytes[index++]<<8) | bytes[index++];
-		// 	//   gyrox.n = "GiroscopioX";
-		// 	//   gyrox.u = "g";
-		// 	//   decoded.modules.push(gyrox);
-		// 	//   var gyroy = {};
-		// 	//   gyroy.v = (bytes[index++]<<8) | bytes[index++];
-		// 	//   gyroy.n = "GiroscopioY";
-		// 	//   gyroy.u = "g";
-		// 	//   decoded.modules.push(gyroy);
-		// 	//   var gyroz = {};
-		// 	//   gyroz.v = (bytes[index++]<<8) | bytes[index++];
-		// 	//   gyroz.n = "GiroscopioZ";
-		// 	//   gyroz.u = "g";
-		// 	//   decoded.modules.push(gyroz);
-		// 	//   break;
+			// 	// case 0x05:
+			// 	//   var gyrox = {};
+			// 	//   gyrox.v = (bytes[index++]<<8) | bytes[index++];
+			// 	//   gyrox.n = "GiroscopioX";
+			// 	//   gyrox.u = "g";
+			// 	//   decoded.modules.push(gyrox);
+			// 	//   var gyroy = {};
+			// 	//   gyroy.v = (bytes[index++]<<8) | bytes[index++];
+			// 	//   gyroy.n = "GiroscopioY";
+			// 	//   gyroy.u = "g";
+			// 	//   decoded.modules.push(gyroy);
+			// 	//   var gyroz = {};
+			// 	//   gyroz.v = (bytes[index++]<<8) | bytes[index++];
+			// 	//   gyroz.n = "GiroscopioZ";
+			// 	//   gyroz.u = "g";
+			// 	//   decoded.modules.push(gyroz);
+			// 	//   break;
 
-		// 	// case 0x06:
-		// 	//   var accx = {};
-		// 	//   accx.v = (bytes[index++]<<8) | bytes[index++];
-		// 	//   accx.n = "AceleromeroX";
-		// 	//   accx.u = "g";
-		// 	//   decoded.modules.push(accx);
-		// 	//   var accy = {};
-		// 	//   accy.v = (bytes[index++]<<8) | bytes[index++];
-		// 	//   accy.n = "AceleromeroY";
-		// 	//   accy.u = "g";
-		// 	//   decoded.modules.push(accy);
-		// 	//   var accz = {};
-		// 	//   accz.v = (bytes[index++]<<8) | bytes[index++];
-		// 	//   accz.n = "AceleromeroZ";
-		// 	//   accz.u = "g";
-		// 	//   decoded.modules.push(accz);
-		// 	//   break;
+			// 	// case 0x06:
+			// 	//   var accx = {};
+			// 	//   accx.v = (bytes[index++]<<8) | bytes[index++];
+			// 	//   accx.n = "AceleromeroX";
+			// 	//   accx.u = "g";
+			// 	//   decoded.modules.push(accx);
+			// 	//   var accy = {};
+			// 	//   accy.v = (bytes[index++]<<8) | bytes[index++];
+			// 	//   accy.n = "AceleromeroY";
+			// 	//   accy.u = "g";
+			// 	//   decoded.modules.push(accy);
+			// 	//   var accz = {};
+			// 	//   accz.v = (bytes[index++]<<8) | bytes[index++];
+			// 	//   accz.n = "AceleromeroZ";
+			// 	//   accz.u = "g";
+			// 	//   decoded.modules.push(accz);
+			// 	//   break;
 
-		// 	// case 0x07:
-		// 	//   var magx = {};
-		// 	//   magx.v = (bytes[index++]<<8) | bytes[index++];
-		// 	//   magx.n = "MagnetometroX";
-		// 	//   magx.u = "mGauss";
-		// 	//   decoded.modules.push(magx);
-		// 	//   var magy = {};
-		// 	//   magy.v = (bytes[index++]<<8) | bytes[index++];
-		// 	//   magy.n = "MagnetometroY";
-		// 	//   magy.u = "mGauss";
-		// 	//   decoded.modules.push(magy);
-		// 	//   var magz = {};
-		// 	//   magz.v = (bytes[index++]<<8) | bytes[index++];
-		// 	//   magz.n = "MagnetometroZ";
-		// 	//   magz.u = "mGauss";
-		// 	//   decoded.modules.push(magz);
-		// 	//   break;
+			// 	// case 0x07:
+			// 	//   var magx = {};
+			// 	//   magx.v = (bytes[index++]<<8) | bytes[index++];
+			// 	//   magx.n = "MagnetometroX";
+			// 	//   magx.u = "mGauss";
+			// 	//   decoded.modules.push(magx);
+			// 	//   var magy = {};
+			// 	//   magy.v = (bytes[index++]<<8) | bytes[index++];
+			// 	//   magy.n = "MagnetometroY";
+			// 	//   magy.u = "mGauss";
+			// 	//   decoded.modules.push(magy);
+			// 	//   var magz = {};
+			// 	//   magz.v = (bytes[index++]<<8) | bytes[index++];
+			// 	//   magz.n = "MagnetometroZ";
+			// 	//   magz.u = "mGauss";
+			// 	//   decoded.modules.push(magz);
+			// 	//   break;
 
-		// 	// case 0x08:
-		// 	//     //data.rtc = data.remainingData.slice(0,6);
-		// 	//     bytes[index++];bytes[index++];
-		// 	//     bytes[index++];
-		// 	//     bytes[index++];
-		// 	//     break;
+			// 	// case 0x08:
+			// 	//     //data.rtc = data.remainingData.slice(0,6);
+			// 	//     bytes[index++];bytes[index++];
+			// 	//     bytes[index++];
+			// 	//     bytes[index++];
+			// 	//     break;
 
-		// 	// case 0x09:
-		// 	//     //data.date = data.remainingData.slice(0,8);
-		// 	//     bytes[index++];bytes[index++];
-		// 	//     bytes[index++];bytes[index++];
+			// 	// case 0x09:
+			// 	//     //data.date = data.remainingData.slice(0,8);
+			// 	//     bytes[index++];bytes[index++];
+			// 	//     bytes[index++];bytes[index++];
 
-		// 	//     break;
+			// 	//     break;
 
-		// 	// case 0x0A:
-		// 	//   var lat = {};
-		// 	//   lat.v = (bytes[index++]);
-		// 	//   var aux = ((bytes[index++]<<16) |(bytes[index++]<<8) | (bytes[index++]));
-		// 	//   aux = aux / 1000000.0;
-		// 	//   if (lat.v > 127)
-		// 	//   {
-		// 	//       lat.v = -((255 - lat.v)+1)-aux;  //complemento de 2
-		// 	//   }
-		// 	//   else
-		// 	//   {
-		// 	//       lat.v = lat.v + aux;
-		// 	//   }
-		// 	//   lat.n = "latitude";
-		// 	//   lat.u = "graus";
-		// 	//   decoded.modules.push(lat);
+		case 0x0A:
+			var f float64
+			sb.WriteString("data_lat=")
+			v := uint64(bytes[i+1])
+			a := uint64(bytes[i+2]) << 16
+			a |= uint64(bytes[i+3]) << 8
+			a |= uint64(bytes[i+4])
+			b := float64(a) / 1000000
 
-		// 	//   var lng = {};
-		// 	//   lng.v = (bytes[index++]);
-		// 	//   aux = ((bytes[index++]<<16) |(bytes[index++]<<8) | (bytes[index++]));
-		// 	//   aux = aux / 1000000.0;
-		// 	//   if (lng.v > 127)
-		// 	//   {
-		// 	//       lng.v = -((255 - lng.v)+1)-aux;  //complemento de 2
-		// 	//   }
-		// 	//   else
-		// 	//   {
-		// 	//       lng.v = lng.v + aux;
-		// 	//   }
-		// 	//   lng.n = "longitude";
-		// 	//   lng.u = "graus";
-		// 	//   decoded.modules.push(lng);
-		// 	//   break;
+			if v > 127 {
+				f = -((255 - float64(v)) + 1) - b //complement of 2
+			} else {
+				f = float64(v) + b
+			}
+			sb.WriteString(strconv.FormatFloat(f, 'f', -1, 64))
+			sb.WriteString(",")
+
+			sb.WriteString("data_lon=")
+			v = uint64(bytes[i+5])
+			a = uint64(bytes[i+6]) << 16
+			a |= uint64(bytes[i+7]) << 8
+			a |= uint64(bytes[i+8])
+			b = float64(a) / 1000000
+
+			if v > 127 {
+				f = -((255 - float64(v)) + 1) - b //complement of 2
+			} else {
+				f = float64(v) + b
+			}
+			sb.WriteString(strconv.FormatFloat(f, 'f', -1, 64))
+			sb.WriteString(",")
+
+			i = i + 8
 
 		case 0x0B:
 			sb.WriteString("data_counter=")
-			v := uint64(bytes[i+1]) << 8
-			v |= uint64(bytes[i+2])
-			f := float64(v)
-			sb.WriteString(strconv.FormatFloat(f, 'f', -1, 64))
+			v := uint64(bytes[i+1]) << 16
+			v |= uint64(bytes[i+2]) << 8
+			v |= uint64(bytes[i+3])
+			sb.WriteString(strconv.FormatUint(v, 10))
 			sb.WriteString(",")
-			i = i + 2
+			i = i + 3
 
 		case 0x0C:
 			sb.WriteString("data_boardVoltage=")
@@ -368,47 +365,79 @@ func imtIotProtocolParser(bytes []byte) string {
 			sb.WriteString(",")
 			i = i + 2
 
-			// 	// case 0x0D:
-			// 	//   switch(contador_0d++)
-			// 	//   {
-			// 	//       case 0:
-			// 	//           var AnalogicInput1 = {};
-			// 	//           AnalogicInput1.v = (bytes[index++]<<8) | bytes[index++]; //`${bytes[index++]}${bytes[index++]}`;
-			// 	//           AnalogicInput1.n = "AnalogicInput1";
-			// 	//           AnalogicInput1.u = "uAD";
-			// 	//           decoded.modules.push(AnalogicInput1);
-			// 	//           break;
-			// 	//       case 1:
-			// 	//           var AnalogicInput2 = {};
-			// 	//           AnalogicInput2.v = (bytes[index++]<<8) | bytes[index++];
-			// 	//           AnalogicInput2.n = "AnalogicInput2";
-			// 	//           AnalogicInput2.u = "uAD";
-			// 	//           decoded.modules.push(AnalogicInput2);
-			// 	//           break;
-			// 	//       case 2:
-			// 	//           var AnalogicInput3 = {};
-			// 	//           AnalogicInput3.v = (bytes[index++]<<8) | bytes[index++];
-			// 	//           AnalogicInput3.n = "AnalogicInput3";
-			// 	//           AnalogicInput3.u = "uAD";
-			// 	//           decoded.modules.push(AnalogicInput3);
-			// 	//           break;
-			// 	//       case 3:
-			// 	//           var AnalogicInput4 = {};
-			// 	//           AnalogicInput4.v = (bytes[index++]<<8) | bytes[index++];
-			// 	//           AnalogicInput4.n = "AnalogicInput4";
-			// 	//           AnalogicInput4.u = "uAD";
-			// 	//           decoded.modules.push(AnalogicInput4);
-			// 	//           break;
-			// 	//   }
+		case 0x0D:
+			switch counter_0d {
+			case 0:
+				sb.WriteString("data_counter_0d_")
+				sb.WriteString(strconv.FormatUint(uint64(counter_0d), 10))
+				sb.WriteString("=")
+				v := uint64(bytes[i+1]) << 8
+				v |= uint64(bytes[i+2])
+				sb.WriteString(strconv.FormatUint(v, 10))
+				sb.WriteString(",")
+				i = i + 2
+				counter_0d = counter_0d + 1
+			case 1:
+				sb.WriteString("data_counter_0d_")
+				sb.WriteString(strconv.FormatUint(uint64(counter_0d), 10))
+				sb.WriteString("=")
+				v := uint64(bytes[i+1]) << 8
+				v |= uint64(bytes[i+2])
+				sb.WriteString(strconv.FormatUint(v, 10))
+				sb.WriteString(",")
+				i = i + 2
+				counter_0d = counter_0d + 1
+			case 2:
+				sb.WriteString("data_counter_0d_")
+				sb.WriteString(strconv.FormatUint(uint64(counter_0d), 10))
+				sb.WriteString("=")
+				v := uint64(bytes[i+1]) << 8
+				v |= uint64(bytes[i+2])
+				sb.WriteString(strconv.FormatUint(v, 10))
+				sb.WriteString(",")
+				i = i + 2
+				counter_0d = counter_0d + 1
+			case 3:
+				sb.WriteString("data_counter_0d_")
+				sb.WriteString(strconv.FormatUint(uint64(counter_0d), 10))
+				sb.WriteString("=")
+				v := uint64(bytes[i+1]) << 8
+				v |= uint64(bytes[i+2])
+				sb.WriteString(strconv.FormatUint(v, 10))
+				sb.WriteString(",")
+				i = i + 2
+				counter_0d = counter_0d + 1
+			}
 
-			// 	//   break;
-
-			// 	// case 0x0E:
-			// 	//     //data.energy = data.remainingData.slice(0,6);
-			// 	//     bytes[index++];bytes[index++];
-			// 	//     bytes[index++];
-			// 	//     break;
-
+		case 0x0E:
+			switch energy_0e {
+			case 0:
+				sb.WriteString("data_energy_")
+				sb.WriteString(strconv.FormatUint(uint64(energy_0e), 10))
+				sb.WriteString("=")
+				v := uint64(bytes[i+1]) << 24
+				v |= uint64(bytes[i+2]) << 16
+				v |= uint64(bytes[i+3]) << 8
+				v |= uint64(bytes[i+4])
+				f := float64(v) * (150 / 5) / 2000
+				sb.WriteString(strconv.FormatFloat(f, 'f', -1, 64))
+				sb.WriteString(",")
+				i = i + 4
+				energy_0e = energy_0e + 1
+			case 1:
+				sb.WriteString("data_energy_")
+				sb.WriteString(strconv.FormatUint(uint64(energy_0e), 10))
+				sb.WriteString("=")
+				v := uint64(bytes[i+1]) << 24
+				v |= uint64(bytes[i+2]) << 16
+				v |= uint64(bytes[i+3]) << 8
+				v |= uint64(bytes[i+4])
+				f := float64(v) * (150 / 5) / 2000
+				sb.WriteString(strconv.FormatFloat(f, 'f', -1, 64))
+				sb.WriteString(",")
+				i = i + 4
+				energy_0e = energy_0e + 1
+			}
 			// 	// case 0x0F:
 			// 	//     //data.rfid = data.remainingData.slice(0,16);
 			// 	//     bytes[index++];bytes[index++];
@@ -421,43 +450,57 @@ func imtIotProtocolParser(bytes []byte) string {
 			sb.WriteString("data_ad=")
 			v := uint64(bytes[i+1]) << 8
 			v |= uint64(bytes[i+2])
-			sb.WriteString(strconv.FormatUint(v, 16))
+			sb.WriteString(strconv.FormatUint(v, 10))
 			sb.WriteString(",")
 			i = i + 2
 
-			// 	// case 0x11:
-			// 	//     //data.currentLoop = data.remainingData.slice(0,4);
-			// 	//     bytes[index++];bytes[index++];
-			// 	//     break;
+		case 0x11:
+			sb.WriteString("data_current_4_20=")
+			v := uint64(bytes[i+1]) << 8
+			v |= uint64(bytes[i+2])
+			f := float64(v) / 100
+			sb.WriteString(strconv.FormatFloat(f, 'f', -1, 64))
+			sb.WriteString(",")
+			i = i + 2
 
 			// 	// case 0x12:
 			// 	//     //data.color = data.remainingData.slice(0,4);
 			// 	//     bytes[index++];bytes[index++];
 			// 	//     break;
 
-			// 	// case 0x13:
-			// 	//   var analog_in = {};
-			// 	//   analog_in.v = (bytes[index++]<<8) | bytes[index++];
-			// 	//   analog_in.n = "distance";
-			// 	//   analog_in.u = "mm";
-			// 	//   decoded.modules.push(analog_in);
-			// 	//   break;
+		case 0x13:
+			sb.WriteString("data_distance=")
+			v := uint64(bytes[i+1]) << 8
+			v |= uint64(bytes[i+2])
+			sb.WriteString(strconv.FormatUint(v, 10))
+			sb.WriteString(",")
+			i = i + 2
 
-			// 	// case 0x14:
-			// 	//     //data.heartbeat = data.remainingData.slice(0,4);
-			// 	//     bytes[index++];bytes[index++];
-			// 	//     break;
+		// 	// case 0x14:
+		// 	//     //data.heartbeat = data.remainingData.slice(0,4);
+		// 	//     bytes[index++];bytes[index++];
+		// 	//     break;
 
-			// 	// case 0x15:
-			// 	//     //data.oxigenVolume = data.remainingData.slice(0,4);
-			// 	//     bytes[index++];bytes[index++];
-			// 	//     break;
+		// 	// case 0x15:
+		// 	//     //data.oxigenVolume = data.remainingData.slice(0,4);
+		// 	//     bytes[index++];bytes[index++];
+		// 	//     break;
 
-			// // case 0x16:
-			// //     //data.fastFourierTransform = data.remainingData.slice(0,34);
-			// //     bytes[index++];bytes[index++];
-			// //     break;
-			// // }
+		// case 0x16:
+		// 	// NEED TO DEBUG
+		// 	for j := 0; j < 17; j++ {
+		// 		sb.WriteString("data_fft_")
+		// 		sb.WriteString(strconv.FormatUint(uint64(j), 10))
+		// 		sb.WriteString("=")
+		// 		v := uint64(bytes[i+1])
+		// 		sb.WriteString(strconv.FormatUint(v, 10))
+		// 		sb.WriteString(",")
+		// 	}
+		// 	i = i + 17
+
+		default:
+			fmt.Print("Data not parsed by decode.LoRaImt imtIotProtocolParser()\n")
+			break PL
 		}
 	}
 
